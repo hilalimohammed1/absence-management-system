@@ -12,10 +12,18 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('absences', function (Blueprint $table) {
+
             $table->id();
-            $table->foreignId('etudiant_id')->constrained('etudiants')->onDelete('cascade');
+
+            $table->foreignId('etudiant_id')
+                  ->constrained('etudiants')
+                  ->onDelete('cascade');
+
             $table->date('date');
-            $table->enum('statut', ['present', 'absent']);
+
+            $table->enum('statut', ['Présent', 'Absent'])
+                  ->default('Présent');
+
             $table->timestamps();
         });
     }
