@@ -1,15 +1,20 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\GroupeController;
+use App\Http\Controllers\API\EtudiantController;
+use App\Http\Controllers\API\AbsenceController;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+Route::post('/login', [AuthController::class, 'login']);
 
+Route::apiResource('groupes', GroupeController::class);
 
-Route::get('/test', function () {
-    return response()->json([
-        'message' => 'API working'
-    ]);
-});
+Route::apiResource('etudiants', EtudiantController::class);
+
+Route::get(
+    '/groupes/{groupe_id}/etudiants',
+    [AbsenceController::class, 'getEtudiantsByGroupe']
+);
+
+Route::post('/absences', [AbsenceController::class, 'store']);
