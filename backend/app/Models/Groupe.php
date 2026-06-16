@@ -2,19 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-
-class Groupe extends Model
+/**
+ * Backward-compatible alias for older API code.
+ *
+ * The active database table is `groups`, not the old French `groupes` table.
+ */
+class Groupe extends Group
 {
-    use HasFactory;
-
-    protected $fillable = [
-        'nom_groupe'
-    ];
-
-    public function etudiants()
-    {
-        return $this->hasMany(Etudiant::class);
-    }
 }

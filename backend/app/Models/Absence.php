@@ -2,21 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-
-class Absence extends Model
+/**
+ * Backward-compatible alias for older API code.
+ *
+ * The active database table is `attendances`, not the old French `absences` table.
+ */
+class Absence extends Attendance
 {
-    use HasFactory;
-
-    protected $fillable = [
-        'etudiant_id',
-        'date',
-        'statut'
-    ];
-
-    public function etudiant()
-    {
-        return $this->belongsTo(Etudiant::class);
-    }
 }

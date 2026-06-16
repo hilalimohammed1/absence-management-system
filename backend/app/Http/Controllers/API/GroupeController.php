@@ -3,47 +3,57 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Models\Groupe;
+use App\Models\Group;
 use Illuminate\Http\Request;
 
 class GroupeController extends Controller
 {
     public function index()
     {
-        return Groupe::all();
+        return Group::withCount('students')->orderBy('group_name')->get();
     }
 
     public function store(Request $request)
     {
-        $groupe = Groupe::create([
-            'nom_groupe' => $request->nom_groupe
+        $data = $request->validate([
+            'group_name' => ['required_without:nom_groupe', 'string', 'max:255'],
+            'nom_groupe' => ['required_without:group_name', 'string', 'max:255'],
+            'description' => ['nullable', 'string', 'max:1000'],
         ]);
 
-        return response()->json($groupe, 201);
+        $group = Group::create([
+            'group_name' => $data['group_name'] ?? $data['nom_groupe'],
+            'description' => $data['description'] ?? null,
+        ]);
+
+        return response()->json($group, 201);
     }
 
-    public function show($id)
+    public function show(Group $groupe)
     {
-        return Groupe::findOrFail($id);
+        return $groupe->load('students');
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, Group $groupe)
     {
-        $groupe = Groupe::findOrFail($id);
+        $data = $request->validate([
+            'group_name' => ['sometimes', 'string', 'max:255'],
+            'nom_groupe' => ['sometimes', 'string', 'max:255'],
+            'description' => ['nullable', 'string', 'max:1000'],
+        ]);
 
         $groupe->update([
-            'nom_groupe' => $request->nom_groupe
+            'group_name' => $data['group_name'] ?? $data['nom_groupe'] ?? $groupe->group_name,
+            'description' => array_key_exists('description', $data) ? $data['description'] : $groupe->description,
         ]);
 
         return response()->json($groupe);
     }
 
-    public function destroy($id)
+    public function destroy(Group $groupe)
     {
-        Groupe::destroy($id);
+        $groupe->delete();
 
-        return response()->json([
-            'message' => 'Groupe supprimé'
-        ]);
+        return response()->json(['message' => 'Group deleted successfully.']);
     }
 }

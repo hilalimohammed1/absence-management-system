@@ -10,24 +10,30 @@ class AuthController extends Controller
 {
     public function login(Request $request)
     {
-        if (!Auth::attempt($request->only('email', 'password'))) {
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required', 'string'],
+        ]);
 
-            return response()->json([
-                'message' => 'Email ou mot de passe incorrect'
-            ], 401);
+        if (! Auth::attempt($credentials)) {
+            return response()->json(['message' => 'Invalid credentials.'], 401);
         }
 
+        $request->session()->regenerate();
+
         return response()->json([
-            'message' => 'Login réussi'
+            'message' => 'Login successful.',
+            'user' => $request->user(),
         ]);
     }
 
-    public function logout()
+    public function logout(Request $request)
     {
         Auth::logout();
 
-        return response()->json([
-            'message' => 'Logout réussi'
-        ]);
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return response()->json(['message' => 'Logout successful.']);
     }
 }
